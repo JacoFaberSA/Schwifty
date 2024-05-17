@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/widgets.dart';
-import 'package:schwifty/schwifty.dart';
+import 'package:schwifty/src/schwifty.dart';
 
 class SchwiftyBuilder<T> extends StatefulWidget {
   const SchwiftyBuilder({
@@ -50,16 +50,12 @@ class _SchwiftyBuilderState<T> extends State<SchwiftyBuilder<T>> {
 
   StreamSubscription<T>? _subscription;
 
-  /// Schwifty instance
-  late Schwifty<T> schwifty;
-
   @override
   void initState() {
     super.initState();
-    schwifty = Schwifty<T>(Schwifty.generateNamespace());
 
     // Listen to the Schwifty instance
-    _subscription = schwifty.stream.listen((value) {
+    _subscription = widget.schwifty.stream.listen((value) {
       _setChild();
     });
 
@@ -79,33 +75,33 @@ class _SchwiftyBuilderState<T> extends State<SchwiftyBuilder<T>> {
   }
 
   void _setChild() {
-    if (widget.shouldRebuild != null && !widget.shouldRebuild!(schwifty)) {
+    if (widget.shouldRebuild != null && !widget.shouldRebuild!(widget.schwifty)) {
       return;
     }
 
     if (widget.onlyRebuildOnValueChange &&
-        schwifty.value != null &&
-        schwifty.previousValue == schwifty.value &&
+        widget.schwifty.value != null &&
+        widget.schwifty.previousValue == widget.schwifty.value &&
         _child.child != null) {
       return;
     }
 
-    if (widget.onlyBuildOnce && schwifty.value != null) {
+    if (widget.onlyBuildOnce && widget.schwifty.value != null) {
       _subscription?.cancel();
-      _child = _Child(child: widget.builder(context, schwifty));
+      _child = _Child(child: widget.builder(context, widget.schwifty));
       return;
     }
 
-    if (schwifty.hasError && widget.errorBuilder != null) {
+    if (widget.schwifty.hasError && widget.errorBuilder != null) {
       _child = _Child(
-          child: widget.errorBuilder!(context, schwifty.error, schwifty));
+          child: widget.errorBuilder!(context, widget.schwifty.error, widget.schwifty));
       return;
-    } else if (schwifty.isLoading && widget.loadingBuilder != null) {
-      _child = _Child(child: widget.loadingBuilder!(context, schwifty));
+    } else if (widget.schwifty.isLoading && widget.loadingBuilder != null) {
+      _child = _Child(child: widget.loadingBuilder!(context, widget.schwifty));
       return;
     }
 
-    _child = _Child(child: widget.builder(context, schwifty));
+    _child = _Child(child: widget.builder(context, widget.schwifty));
     if (context.mounted) {
       setState(() {});
     }

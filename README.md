@@ -1,4 +1,4 @@
-# Let's get Schwifty!
+# Schwifty
 
 This is a simple stream-based state machine for Flutter. It was designed to be a simplified version of the BLoC pattern that does not rely on context and requires less boilerplate.
 
@@ -74,8 +74,6 @@ SchwiftyBuilder<int>(
   },
 );
 ```
-
-You can also leave the `schwifty` property empty, which will cause the `StreamBuilder` to create a new `Schwifty` instance for you with a unique name.
 
 ### Updating the State
 
