@@ -46,7 +46,7 @@ class SchwiftyBuilder<T> extends StatefulWidget {
 }
 
 class _SchwiftyBuilderState<T> extends State<SchwiftyBuilder<T>> {
-  late var _child = const _Child(child: null);
+  late var _child = const _Child(child: SizedBox());
 
   StreamSubscription<T>? _subscription;
 
@@ -75,29 +75,33 @@ class _SchwiftyBuilderState<T> extends State<SchwiftyBuilder<T>> {
   }
 
   void _setChild() {
-    if (widget.shouldRebuild != null && !widget.shouldRebuild!(widget.schwifty)) {
+    if (widget.shouldRebuild != null &&
+        !widget.shouldRebuild!(widget.schwifty)) {
       return;
     }
 
     if (widget.onlyRebuildOnValueChange &&
         widget.schwifty.value != null &&
-        widget.schwifty.previousValue == widget.schwifty.value &&
-        _child.child != null) {
+        widget.schwifty.previousValue == widget.schwifty.value) {
       return;
     }
 
     if (widget.onlyBuildOnce && widget.schwifty.value != null) {
       _subscription?.cancel();
       _child = _Child(child: widget.builder(context, widget.schwifty));
+      setState(() {});
       return;
     }
 
     if (widget.schwifty.hasError && widget.errorBuilder != null) {
       _child = _Child(
-          child: widget.errorBuilder!(context, widget.schwifty.error, widget.schwifty));
+          child: widget.errorBuilder!(
+              context, widget.schwifty.error, widget.schwifty));
+      setState(() {});
       return;
     } else if (widget.schwifty.isLoading && widget.loadingBuilder != null) {
       _child = _Child(child: widget.loadingBuilder!(context, widget.schwifty));
+      setState(() {});
       return;
     }
 
@@ -108,13 +112,26 @@ class _SchwiftyBuilderState<T> extends State<SchwiftyBuilder<T>> {
   }
 }
 
-class _Child extends StatelessWidget {
-  const _Child({required this.child});
+class _Child extends StatefulWidget {
+  const _Child({super.key, required this.child});
 
-  final Widget? child;
+  final Widget child;
+
+  @override
+  State<_Child> createState() => __ChildState();
+}
+
+class __ChildState extends State<_Child> {
+  @override
+  void didUpdateWidget(covariant _Child oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.child != oldWidget.child) {
+      setState(() {});
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return child ?? const SizedBox.shrink();
+    return widget.child;
   }
 }
