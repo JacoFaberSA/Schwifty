@@ -50,15 +50,23 @@ class Schwifty<T> {
   /// Get the previous value
   T? get previousValue => _previousValue;
 
-  void emit(T value) {
+  /// Emit a value to the stream
+  /// If null is provided, the previous value will be emitted
+  void emit(T? value) {
     if (_streamController.isClosed) {
       throw Exception('Schwifty instance is disposed');
     }
 
-    _error = null;
-    _previousValue = _currentValue;
-    _currentValue = value;
-    _streamController.add(value);
+    if (value == null) {
+      if (_currentValue != null) {
+        _streamController.add(_currentValue as T);
+      }
+    } else {
+      _error = null;
+      _previousValue = _currentValue;
+      _currentValue = value;
+      _streamController.add(value as T);
+    }
   }
 
   void emitError(Object? error) {

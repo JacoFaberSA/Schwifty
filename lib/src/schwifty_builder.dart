@@ -11,7 +11,6 @@ class SchwiftyBuilder<T> extends StatefulWidget {
     this.errorBuilder,
     this.loadingBuilder,
     this.shouldRebuild,
-    this.onlyRebuildOnValueChange = true,
     this.onlyBuildOnce = false,
   });
 
@@ -35,9 +34,6 @@ class SchwiftyBuilder<T> extends StatefulWidget {
   /// Function to determine if the builder should rebuild.
   final bool Function(Schwifty<T> schwifty)? shouldRebuild;
 
-  /// Only rebuild the widget if the value changes.
-  final bool onlyRebuildOnValueChange;
-
   /// Only build the widget once then stop listening to the stream.
   final bool onlyBuildOnce;
 
@@ -46,7 +42,7 @@ class SchwiftyBuilder<T> extends StatefulWidget {
 }
 
 class _SchwiftyBuilderState<T> extends State<SchwiftyBuilder<T>> {
-  late var _child = const _Child(child: SizedBox());
+  late Widget _child = const SizedBox();
 
   StreamSubscription<T>? _subscription;
 
@@ -80,58 +76,25 @@ class _SchwiftyBuilderState<T> extends State<SchwiftyBuilder<T>> {
       return;
     }
 
-    if (widget.onlyRebuildOnValueChange &&
-        widget.schwifty.value != null &&
-        widget.schwifty.previousValue == widget.schwifty.value) {
-      return;
-    }
-
     if (widget.onlyBuildOnce && widget.schwifty.value != null) {
       _subscription?.cancel();
-      _child = _Child(child: widget.builder(context, widget.schwifty));
+      _child = widget.builder(context, widget.schwifty);
       setState(() {});
       return;
     }
 
     if (widget.schwifty.hasError && widget.errorBuilder != null) {
-      _child = _Child(
-          child: widget.errorBuilder!(
-              context, widget.schwifty.error, widget.schwifty));
+      _child =
+          widget.errorBuilder!(context, widget.schwifty.error, widget.schwifty);
       setState(() {});
       return;
     } else if (widget.schwifty.isLoading && widget.loadingBuilder != null) {
-      _child = _Child(child: widget.loadingBuilder!(context, widget.schwifty));
+      _child = widget.loadingBuilder!(context, widget.schwifty);
       setState(() {});
       return;
     }
 
-    _child = _Child(child: widget.builder(context, widget.schwifty));
-    if (context.mounted) {
-      setState(() {});
-    }
-  }
-}
-
-class _Child extends StatefulWidget {
-  const _Child({super.key, required this.child});
-
-  final Widget child;
-
-  @override
-  State<_Child> createState() => __ChildState();
-}
-
-class __ChildState extends State<_Child> {
-  @override
-  void didUpdateWidget(covariant _Child oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.child != oldWidget.child) {
-      setState(() {});
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return widget.child;
+    _child = widget.builder(context, widget.schwifty);
+    setState(() {});
   }
 }

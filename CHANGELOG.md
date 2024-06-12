@@ -1,3 +1,7 @@
+## 0.0.4
+
+- Improve builder state management.
+
 ## 0.0.3
 
 - Improve builder state management.
