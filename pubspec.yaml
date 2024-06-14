@@ -1,6 +1,6 @@
 name: schwifty
 description: "This is a simple stream-based state machine for Flutter. It was designed to be a simplified version of the BLoC pattern that does not rely on context and requires less boilerplate."
-version: 0.0.4
+version: 0.0.5
 homepage: https://github.com/JacoFaberSA/Schwifty
 
 environment:

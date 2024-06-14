@@ -1,3 +1,7 @@
+## 0.0.5
+
+- Change `SchwiftyBuilder` to use `StreamBuilder` internally for better state management.
+
 ## 0.0.4
 
 - Improve builder state management.
